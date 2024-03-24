@@ -32,18 +32,55 @@ func calculateCalibration(input string) int {
 }
 
 func findCalibrationValue(value string) string {
-	first := ""
-	last := ""
+	var first, last string
 
-	for _, c := range value {
+	for i, c := range value {
 		if unicode.IsDigit(c) {
-			if first == "" {
+			if len(first) == 0 {
 				first = string(c)
 			}
 
 			last = string(c)
+		} else {
+			digit, err := getDigit(value, i)
+
+			if err != nil {
+				continue
+			}
+
+			if len(first) == 0 {
+				first = digit
+			}
+
+			last = digit
 		}
 	}
 
 	return first + last
+}
+
+func getDigit(value string, startIndex int) (string, error) {
+	letters := map[string]string{
+		"one":   "1",
+		"two":   "2",
+		"three": "3",
+		"four":  "4",
+		"five":  "5",
+		"six":   "6",
+		"seven": "7",
+		"eight": "8",
+		"nine":  "9",
+	}
+
+	for endIndex := startIndex; endIndex <= len(value); endIndex++ {
+		sliced := value[startIndex:endIndex]
+
+		for key := range letters {
+			if sliced == key {
+				return letters[key], nil
+			}
+		}
+	}
+
+	return "", fmt.Errorf("No digit found")
 }
